@@ -1,0 +1,48 @@
+[
+  {
+    "id": 102,
+    "paciente": "Carlos Ruiz",
+    "documento": "31654210",
+    "especialidad": "Pediatría",
+    "fecha": "14/08/2026",
+    "hora": "10.00",
+    "confirmado": true
+  },
+  {
+    "id": 102,
+    "paciente": "Carlos Ruiz",
+    "documento": "31654210",
+    "especialidad": "Pediatría",
+    "fecha": "14/08/2026",
+    "hora": "10.00",
+    "confirmado": true
+  },
+  {
+    "id": 102,
+    "paciente": "Carlos Ruiz",
+    "documento": "31654210",
+    "especialidad": "Pediatría",
+    "fecha": "14/08/2026",
+    "hora": "10.00",
+    "confirmado": true,
+    "observaciones": "Presentarse 15 min antes"
+  },
+  {
+    "id": 104,
+    "paciente": "Augusto Sorrentin",
+    "documento": "12",
+    "especialidad": "Traumatología",
+    "fecha": "10/7/25",
+    "hora": "14:50",
+    "confirmado": true
+  },
+  {
+    "id": 107,
+    "paciente": "Fatima Sorrentio",
+    "documento": "12455322",
+    "especialidad": "Oftalmología",
+    "fecha": "14/08/2026",
+    "hora": "10.15",
+    "confirmado": false
+  }
+]

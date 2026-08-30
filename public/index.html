@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TurnosRed - Eventos en Tiempo Real</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    .status {
+      padding: 10px;
+      margin: 20px 0;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .connected {
+      background: #d4edda;
+      color: #155724;
+    }
+    .disconnected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .events-log {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 15px;
+      height: 400px;
+      overflow-y: auto;
+    }
+    .event {
+      padding: 10px;
+      margin: 5px 0;
+      border-left: 4px solid #007bff;
+      background: #f8f9fa;
+    }
+    .event.creado {
+      border-left-color: #28a745;
+      background: #d4edda;
+    }
+    .event.actualizado {
+      border-left-color: #ffc107;
+      background: #fff3cd;
+    }
+    .event.eliminado {
+      border-left-color: #dc3545;
+      background: #f8d7da;
+    }
+    .timestamp {
+      color: #666;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <h1>🏥 TurnosRed - Monitor en Tiempo Real</h1>
+  
+  <div id="status" class="status disconnected">
+    ❌ Desconectado
+  </div>
+
+  <h2>📋 Eventos Recibidos</h2>
+  <div class="events-log" id="eventLog">
+    <p style="color: #999;">Esperando conexión...</p>
+  </div>
+
+  <script>
+    const socket = io();
+    const statusDiv = document.getElementById("status");
+    const eventLog = document.getElementById("eventLog");
+
+    // Conectar
+    socket.on("connect", () => {
+      statusDiv.className = "status connected";
+      statusDiv.textContent = `✅ Conectado (ID: ${socket.id})`;
+      eventLog.innerHTML = '<p style="color: #28a745;"><strong>✅ Conectado al servidor</strong></p>';
+    });
+
+    // Desconectar
+    socket.on("disconnect", () => {
+      statusDiv.className = "status disconnected";
+      statusDiv.textContent = "❌ Desconectado";
+      addEvent("SISTEMA", "Desconectado del servidor", "eliminado");
+    });
+
+    // Escuchar eventos de turnos
+    socket.on("turno:creado", (turno) => {
+      addEvent(
+        "TURNO CREADO",
+        `${turno.paciente} (ID: ${turno.id}) - ${turno.especialidad}`,
+        "creado"
+      );
+    });
+
+    socket.on("turno:actualizado", (turno) => {
+      addEvent(
+        "TURNO ACTUALIZADO",
+        `${turno.paciente} (ID: ${turno.id}) - ${turno.especialidad}`,
+        "actualizado"
+      );
+    });
+
+    socket.on("turno:eliminado", (data) => {
+      addEvent(
+        "TURNO ELIMINADO",
+        `ID: ${data.id}`,
+        "eliminado"
+      );
+    });
+
+    // Función para agregar evento al log
+    function addEvent(tipo, mensaje, clase) {
+      const timestamp = new Date().toLocaleTimeString();
+      const eventDiv = document.createElement("div");
+      eventDiv.className = `event ${clase}`;
+      eventDiv.innerHTML = `
+        <strong>${tipo}</strong><br>
+        ${mensaje}<br>
+        <span class="timestamp">${timestamp}</span>
+      `;
+      eventLog.appendChild(eventDiv);
+      eventLog.scrollTop = eventLog.scrollHeight;
+    }
+  </script>
+</body>
+</html>

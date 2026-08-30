@@ -1,0 +1,32 @@
+{
+  "name": "gestion-turnos",
+  "version": "1.0.0",
+  "description": "Servidor inicial para gestionar turnos",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "compilar": "tsc",
+    "iniciar": "node dist/server.js",
+    "dev": "ts-node src/server.ts",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write",
+    "test": "jest"
+  },
+  "author": "Mei Judith Difalco",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.6",
+    "@eslint/js": "^10.0.1",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.4.0",
+    "eslint": "^10.9.1",
+    "prettier": "^3.9.6",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.68.0"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
+  }
+}
