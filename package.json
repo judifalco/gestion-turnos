@@ -8,6 +8,7 @@
     "compilar": "tsc",
     "iniciar": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
+    "debug": "node --inspect-brk=9229 --loader tsx dist/server.js",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write",
     "test": "jest"

@@ -1,39 +1,11 @@
 [
   {
-    "id": 102,
-    "paciente": "Carlos Ruiz",
-    "documento": "31654210",
-    "especialidad": "Pediatría",
-    "fecha": "14/08/2026",
-    "hora": "10.00",
-    "confirmado": true
-  },
-  {
-    "id": 102,
-    "paciente": "Carlos Ruiz",
-    "documento": "31654210",
-    "especialidad": "Pediatría",
-    "fecha": "14/08/2026",
-    "hora": "10.00",
-    "confirmado": true
-  },
-  {
-    "id": 102,
-    "paciente": "Carlos Ruiz",
-    "documento": "31654210",
-    "especialidad": "Pediatría",
-    "fecha": "14/08/2026",
-    "hora": "10.00",
-    "confirmado": true,
-    "observaciones": "Presentarse 15 min antes"
-  },
-  {
     "id": 104,
-    "paciente": "Augusto Sorrentin",
-    "documento": "12",
+    "paciente": "Augusto Sorrentio",
+    "documento": "1566778",
     "especialidad": "Traumatología",
-    "fecha": "10/7/25",
-    "hora": "14:50",
+    "fecha": "undefined",
+    "hora": "undefined",
     "confirmado": true
   },
   {
@@ -43,6 +15,42 @@
     "especialidad": "Oftalmología",
     "fecha": "14/08/2026",
     "hora": "10.15",
+    "confirmado": false
+  },
+  {
+    "id": 105,
+    "paciente": "Test User",
+    "documento": "12345678",
+    "especialidad": "Cardiología",
+    "fecha": "2026-09-10",
+    "hora": "10:00",
+    "confirmado": false
+  },
+  {
+    "id": 106,
+    "paciente": "Test User",
+    "documento": "12345678",
+    "especialidad": "Cardiología",
+    "fecha": "2026-09-10",
+    "hora": "10:00",
+    "confirmado": false
+  },
+  {
+    "id": 109,
+    "paciente": "Test User",
+    "documento": "123456789",
+    "especialidad": "Traumatología",
+    "fecha": "2026-09-10",
+    "hora": "10:00",
+    "confirmado": false
+  },
+  {
+    "id": 108,
+    "paciente": "Test User",
+    "documento": "undefined",
+    "especialidad": "Traumatología",
+    "fecha": "2026-09-10",
+    "hora": "10:00",
     "confirmado": false
   }
 ]
