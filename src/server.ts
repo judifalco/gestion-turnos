@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { Server } from "socket.io";
 import turnosRouter from "./routes/turnos.js";
 import { turnoEmitter } from "./events/turnoEmitter.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -49,6 +50,9 @@ turnoEmitter.on("turno:creado", (turno) => {
     io.emit("turno:eliminado", data);
   });
   
+// Middleware de errores
+app.use(errorHandler);
+
 // Iniciar el servidor
 httpServer.listen(PORT, () => {
     console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
