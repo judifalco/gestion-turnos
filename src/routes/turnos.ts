@@ -6,8 +6,10 @@ import {
   actualizarTurnoController,
   eliminarTurnoController,
 } from "../controllers/turnoController.js";
-import { errorHandler } from "../middlewares/errorHandler.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { validateBody } from "../middlewares/validationMiddleware.js";
+import { turnoInputSchema } from "../schemas/turnoSchema.js";
+
 
 const router = Router();
 
@@ -18,10 +20,20 @@ router.get("/", asyncHandler(obtenerTodosLosController));
 router.get("/:id", asyncHandler(obtenerPorIdController));
 
 // POST / — Crear un nuevo turno
-router.post("/", asyncHandler(crearTurnoController));
+// Valida el body antes de llamar al controlador
+router.post(
+  "/",
+  validateBody(turnoInputSchema),
+  asyncHandler(crearTurnoController)
+);
 
 // PUT /:id — Actualizar un turno
-router.put("/:id", asyncHandler(actualizarTurnoController));
+// Valida el body antes de llamar al controlador
+router.put(
+  "/:id",
+  validateBody(turnoInputSchema),
+  asyncHandler(actualizarTurnoController)
+);
 
 // DELETE /:id — Eliminar un turno
 router.delete("/:id", asyncHandler(eliminarTurnoController));

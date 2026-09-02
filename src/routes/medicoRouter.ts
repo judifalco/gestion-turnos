@@ -7,6 +7,9 @@ import {
   eliminarMedicoController,
 } from "../controllers/medicoController.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { validateBody } from "../middlewares/validationMiddleware.js";
+import { medicoInputSchema } from "../schemas/medicoSchema.js";
+
 
 const router = Router();
 
@@ -17,11 +20,22 @@ router.get("/", asyncHandler(obtenerTodosMedicosController));
 router.get("/:id", asyncHandler(obtenerMedicosPorIdController));
 
 // POST / — Crear un nuevo médico
-router.post("/", asyncHandler(crearMedicoController));
+// Valida el body antes de llamar al controlador
+router.post(
+    "/",
+    validateBody(medicoInputSchema),
+    asyncHandler(crearMedicoController)
+  );
+
 
 // PUT /:id — Actualizar un médico
-router.put("/:id", asyncHandler(actualizarMedicoController));
-
+// Valida el body antes de llamar al controlador
+router.put(
+    "/:id",
+    validateBody(medicoInputSchema),
+    asyncHandler(actualizarMedicoController)
+  );
+  
 // DELETE /:id — Eliminar un médico
 router.delete("/:id", asyncHandler(eliminarMedicoController));
 
