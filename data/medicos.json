@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "nombre": "Dr. López",
+    "documento": "undefined",
+    "especialidad": "Espeleología",
+    "disponible": true
+  },
+  {
+    "id": 2,
+    "nombre": "Dra. García",
+    "documento": "87654321",
+    "especialidad": "Odontología",
+    "disponible": true
+  }
+]

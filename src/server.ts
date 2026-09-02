@@ -2,6 +2,7 @@ import express from "express";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 import turnosRouter from "./routes/turnos.js";
+import medicoRouter from "./routes/medicoRouter.js";
 import { turnoEmitter } from "./events/turnoEmitter.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 
@@ -20,6 +21,8 @@ app.use(express.json());
 
 // Conectar las rutas
 app.use("/turnos", turnosRouter);
+
+app.use("/medicos", medicoRouter);
 
 
 //Uso de public
