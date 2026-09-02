@@ -3,17 +3,38 @@ import { Request, Response, NextFunction } from "express";
 import {
   crearTurnoService,
   obtenerTodosService,
+  obtenerTurnosConFiltrosService,
   obtenerPorIdService,
   actualizarTurnoService,
   eliminarTurnoService,
+  FiltrosTurnos
 } from "../services/turnoService.js";
 
-// GET /turnos — Obtener todos
+// GET /turnos — Obtener todos o con filtros
 export async function obtenerTodosLosController(
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction
 ): Promise<void> {
+  // Verificar si hay query parameters de filtro
+  const tieneEspecialidad = req.query.especialidad !== undefined;
+  const tieneFecha = req.query.fecha !== undefined;
+  const tieneMedicoId = req.query.medicoId !== undefined;
+
+  // Si hay al menos un filtro, usar la función con filtros
+  if (tieneEspecialidad || tieneFecha || tieneMedicoId) {
+    const filtros: FiltrosTurnos = {
+      especialidad: req.query.especialidad as string | undefined,
+      fecha: req.query.fecha as string | undefined,
+      medicoId: req.query.medicoId ? Number(req.query.medicoId) : undefined,
+    };
+
+    const turnos = await obtenerTurnosConFiltrosService(filtros);
+    res.status(200).json(turnos);
+    return;
+  }
+
+  // Si no hay filtros, obtener todos
   const turnos = await obtenerTodosService();
   res.status(200).json(turnos);
 }

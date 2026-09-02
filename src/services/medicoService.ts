@@ -2,11 +2,42 @@ import { Medico, MedicoCrudo } from "../models/models.js";
 import { leerMedicos, guardarMedicos } from "../fileServices.js";
 import { AppError } from "../utils/AppError.js";
 
+// ========== INTERFAZ DE FILTROS ==========
+export interface FiltrosMedicos {
+    especialidad?: string;
+    disponible?: boolean;
+  }
+
 // GET /medicos — Obtener todos
 export async function obtenerTodosMedicosService(): Promise<Medico[]> {
   const medicos = await leerMedicos();
   return medicos;
 }
+
+// GET /medicos — Obtener con filtros opcionales
+export async function obtenerMedicosConFiltrosService(
+    filtros: FiltrosMedicos
+  ): Promise<Medico[]> {
+    const medicos = await leerMedicos();
+  
+    // Aplicar filtros de forma encadenada
+    let resultado = medicos;
+  
+    // Filtrar por especialidad (case-insensitive)
+    if (filtros.especialidad) {
+      resultado = resultado.filter(
+        m => m.especialidad.toLowerCase() === filtros.especialidad!.toLowerCase()
+      );
+    }
+  
+    // Filtrar por disponible
+    if (filtros.disponible !== undefined) {
+      resultado = resultado.filter(m => m.disponible === filtros.disponible);
+    }
+  
+    return resultado;
+  }
+  
 
 // GET /medicos/:id — Obtener por ID
 export async function obtenerMedicosPorIdService(id: number): Promise<Medico> {

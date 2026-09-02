@@ -2,20 +2,39 @@ import { Request, Response, NextFunction } from "express";
 import {
   crearMedicoService,
   obtenerTodosMedicosService,
+  obtenerMedicosConFiltrosService,
   obtenerMedicosPorIdService,
   actualizarMedicoService,
   eliminarMedicoService,
+  FiltrosMedicos
 } from "../services/medicoService.js";
 
-// GET /medicos — Obtener todos
+// GET /medicos — Obtener todos o con filtros
 export async function obtenerTodosMedicosController(
-  _req: Request,
-  res: Response,
-  _next: NextFunction
-): Promise<void> {
-  const medicos = await obtenerTodosMedicosService();
-  res.status(200).json(medicos);
-}
+    req: Request,
+    res: Response,
+    _next: NextFunction
+  ): Promise<void> {
+    // Verificar si hay query parameters de filtro
+    const tieneEspecialidad = req.query.especialidad !== undefined;
+    const tieneDisponible = req.query.disponible !== undefined;
+  
+    // Si hay al menos un filtro, usar la función con filtros
+    if (tieneEspecialidad || tieneDisponible) {
+      const filtros: FiltrosMedicos = {
+        especialidad: req.query.especialidad as string | undefined,
+        disponible: req.query.disponible === "true" ? true : req.query.disponible === "false" ? false : undefined,
+      };
+  
+      const medicos = await obtenerMedicosConFiltrosService(filtros);
+      res.status(200).json(medicos);
+      return;
+    }
+  
+    // Si no hay filtros, obtener todos
+    const medicos = await obtenerTodosMedicosService();
+    res.status(200).json(medicos);
+  }
 
 // GET /medicos/:id — Obtener por ID
 export async function obtenerMedicosPorIdController(

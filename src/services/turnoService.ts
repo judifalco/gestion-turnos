@@ -4,10 +4,48 @@ import { guardarTurnos } from "../fileServices.js";
 import { turnoEmitter } from "../events/turnoEmitter.js";
 import { AppError } from "../utils/AppError.js";
 
+// ========== INTERFAZ DE FILTROS ==========
+export interface FiltrosTurnos {
+  especialidad?: string;
+  fecha?: string;
+  medicoId?: number;
+}
+
 // GET /turnos — Obtener todos
 export async function obtenerTodosService(): Promise<Turno[]> {
   const turnos = await leerTurnos();
   return turnos;
+}
+
+// GET /turnos — Obtener con filtros opcionales
+export async function obtenerTurnosConFiltrosService(
+  filtros: FiltrosTurnos
+): Promise<Turno[]> {
+  const turnos = await leerTurnos();
+
+  // Aplicar filtros de forma encadenada
+  let resultado = turnos;
+
+  // Filtrar por especialidad (case-insensitive)
+  if (filtros.especialidad) {
+    resultado = resultado.filter(
+      t => t.especialidad.toLowerCase() === filtros.especialidad!.toLowerCase()
+    );
+  }
+
+  // Filtrar por fecha
+  if (filtros.fecha) {
+    resultado = resultado.filter(t => t.fecha === filtros.fecha);
+  }
+
+  // Filtrar por medicoId (si ese campo existiera en Turno)
+  // Por ahora lo dejamos documentado para futuro
+  if (filtros.medicoId) {
+    // TODO: Implementar cuando Turno tenga relación con Médico
+    console.warn("⚠️ Filtro medicoId aún no implementado en Turno");
+  }
+
+  return resultado;
 }
 
 // GET /turnos/:id — Obtener por ID
