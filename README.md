@@ -86,40 +86,84 @@ npm iniciar        # Ejecutar compilado
 npm run lint     # Validar código
 npm run format   # Formatear código
 
-📁 Estructura de carpetas
+📁 Estructura de Carpetas
+
 turnos-red/
 ├── src/
 │   ├── events/
-│   │   └── turnoEmitter.ts          # Bus de eventos internos
+│   │   └── turnoEmitter.ts              # Bus de eventos internos
+│   │
 │   ├── routes/
-│   │   └── turnos.ts                # Definición de rutas
+│   │   ├── turnos.ts                    # Rutas de turnos con validación
+│   │   └── medicoRouter.ts              # ✅ Rutas de médicos con validación
+│   │
 │   ├── controllers/
-│   │   └── turnoController.ts       # Controladores (reciben solicitudes)
+│   │   ├── turnoController.ts           # Controladores de turnos
+│   │   └── medicoController.ts          # ✅ Controladores de médicos
+│   │
 │   ├── services/
-│   │   └── turnoService.ts          # Lógica de negocio
-│   ├── models.ts                    # Interfaces TypeScript
-│   ├── fileServices.ts              # Lectura/escritura de archivos
-│   └── server.ts                    # Configuración de Express y Socket.IO
+│   │   ├── turnoService.ts              # Lógica de negocio de turnos (CRUD + filtros)
+│   │   └── medicoService.ts             # ✅ Lógica de negocio de médicos (CRUD + filtros)
+│   │
+│   ├── schemas/
+│   │   ├── turnoSchema.ts               # ✅ Esquemas Zod para validación de turnos
+│   │   └── medicoSchema.ts              # ✅ Esquemas Zod para validación de médicos
+│   │
+│   ├── middlewares/
+│   │   ├── errorHandler.ts              # Manejo centralizado de errores
+│   │   └── validationMiddleware.ts      # ✅ Middleware de validación con Zod
+│   │
+│   ├── utils/
+│   │   ├── AppError.ts                  # Clase personalizada de errores
+│   │   └── asyncHandler.ts              # ✅ Wrapper para capturar errores async
+│   │
+│   ├── models/
+│   │   └── models.ts                    # Interfaces TypeScript (Turno, Médico, etc.)
+│   │
+│   ├── fileServices.ts                  # Lectura/escritura de archivos JSON
+│   └── server.ts                        # Configuración de Express y Socket.IO
+│
 ├── data/
-│   └── turnos.json                  # Base de datos (archivo JSON)
+│   ├── turnos.json                      # Base de datos de turnos (JSON)
+│   └── medicos.json                     # ✅ Base de datos de médicos (JSON)
+│
 ├── public/
-│   └── index.html                   # Cliente de prueba (Socket.IO)
-├── dist/                            # Código compilado (se genera con `npm run build`)
-├── .env                             # Variables de entorno (NO se sube a GitHub)
-├── .env.example                     # Ejemplo de variables de entorno
-├── .gitignore                       # Archivos a ignorar en Git
-├── .eslintrc.json                   # Configuración ESLint
-├── .prettierrc.json                 # Configuración Prettier
-├── tsconfig.json                    # Configuración TypeScript
-├── package.json                     # Dependencias del proyecto
-├── package-lock.json                # Lock de dependencias
-└── README.md                        # Este archivo
-Descripción de directorios principales:
+│   └── index.html                       # Cliente de prueba (Socket.IO)
+│
+├── dist/                                # Código compilado (generado automáticamente)
+│
+├── .env                                 # Variables de entorno (NO se sube a GitHub)
+├── .env.example                         # Ejemplo de variables de entorno
+├── .gitignore                           # Archivos a ignorar en Git
+├── .eslintrc.json                       # Configuración ESLint
+├── .prettierrc.json                     # Configuración Prettier
+├── tsconfig.json                        # Configuración TypeScript (strict mode)
+├── package.json                         # Dependencias del proyecto
+├── package-lock.json                    # Lock de dependencias
+├── turnos-red.postman_collection.json       # ✅ Colección de Postman con tests
+├── README.md                            # Documentación técnica
+└── .nvmrc                               # Versión de Node.js (NVM)
 
-src/ — Código fuente TypeScript
-data/ — Datos persistidos en JSON
-public/ — Archivos estáticos (HTML, CSS, JS para clientes)
-dist/ — Código compilado a JavaScript (generado automáticamente)
+---
+
+### 📂 Descripción de Directorios Principales
+
+| Directorio | Descripción |
+|-----------|-------------|
+| **src/** | Código fuente TypeScript |
+| **src/events/** | Bus de eventos interno con EventEmitter |
+| **src/routes/** | Definición de endpoints REST (turnos y médicos) |
+| **src/controllers/** | Controladores que reciben solicitudes HTTP |
+| **src/services/** | Lógica de negocio (CRUD, filtros, normalizaciones) |
+| **src/schemas/** | ✅ Esquemas Zod para validación de entrada |
+| **src/middlewares/** | ✅ Middlewares (validación, manejo de errores) |
+| **src/utils/** | ✅ Funciones auxiliares (AppError, asyncHandler) |
+| **src/models/** | Interfaces TypeScript para tipado |
+| **data/** | Persistencia en archivos JSON |
+| **public/** | Archivos estáticos (cliente Socket.IO) |
+| **dist/** | Código compilado a JavaScript (generado) |
+
+---
 
 ## 🔌 Endpoints REST
 
