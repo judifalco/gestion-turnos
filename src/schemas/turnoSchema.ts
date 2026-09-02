@@ -21,9 +21,9 @@ export const turnoSchema = z.object({
     .trim()
     .min(1, "Especialidad es obligatoria")
     .refine(
-      (valor) => /^[A-Z][a-záéíóúñ\s]*$/.test(valor),
-      "Especialidad debe estar en Title Case (ej: Pediatría, Clínica Médica)"
-    ),
+        (valor) => /^[A-Z][a-záéíóúñ]*(\s[A-Z][a-záéíóúñ]*)*$/.test(valor),
+        "Especialidad debe estar en Title Case (ej: Pediatría, Clínica Médica)"
+      ),
   fecha: z
     .string()
     .trim()
@@ -63,9 +63,9 @@ export const turnoInputSchema = z.object({
     .trim()
     .min(1, "Especialidad es obligatoria")
     .refine(
-      (valor) => /^[A-Z][a-záéíóúñ\s]*$/.test(valor),
-      "Especialidad debe estar en Title Case (ej: Pediatría, Clínica Médica)"
-    ),
+        (valor) => /^[A-Z][a-záéíóúñ]*(\s[A-Z][a-záéíóúñ]*)*$/.test(valor),
+        "Especialidad debe estar en Title Case (ej: Pediatría, Clínica Médica)"
+      ),
   fecha: z
     .string()
     .trim()

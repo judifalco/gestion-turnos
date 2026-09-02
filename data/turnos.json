@@ -1,5 +1,14 @@
 [
   {
+    "id": 1,
+    "paciente": "Carlos López Actualizado",
+    "documento": "12345678",
+    "especialidad": "Odontología",
+    "fecha": "2026-07-20",
+    "hora": "15:00",
+    "confirmado": true
+  },
+  {
     "id": 104,
     "paciente": "Augusto Sorrentio",
     "documento": "1566778",
@@ -51,6 +60,15 @@
     "especialidad": "Traumatología",
     "fecha": "2026-09-10",
     "hora": "10:00",
+    "confirmado": false
+  },
+  {
+    "id": 5,
+    "paciente": "Juan Pérez",
+    "documento": "55555555",
+    "especialidad": "Clínica Médica",
+    "fecha": "2026-08-10",
+    "hora": "09:15",
     "confirmado": false
   }
 ]

@@ -22,9 +22,9 @@ export const medicoSchema = z.object({
     .trim()
     .min(1, "Especialidad es obligatoria")
     .refine(
-      (valor) => /^[A-Z][a-záéíóúñ\s]*$/.test(valor),
-      "Especialidad debe estar en Title Case (ej: Pediatría, Odontología)"
-    ),
+        (valor) => /^[A-Z][a-záéíóúñ]*(\s[A-Z][a-záéíóúñ]*)*$/.test(valor),
+        "Especialidad debe estar en Title Case (ej: Pediatría, Clínica Médica)"
+      ),
   disponible: z.boolean(),
 });
 
@@ -49,9 +49,9 @@ export const medicoInputSchema = z.object({
     .trim()
     .min(1, "Especialidad es obligatoria")
     .refine(
-      (valor) => /^[A-Z][a-záéíóúñ\s]*$/.test(valor),
-      "Especialidad debe estar en Title Case (ej: Pediatría, Odontología)"
-    ),
+        (valor) => /^[A-Z][a-záéíóúñ]*(\s[A-Z][a-záéíóúñ]*)*$/.test(valor),
+        "Especialidad debe estar en Title Case (ej: Pediatría, Clínica Médica)"
+      ),
   disponible: z
     .union([z.boolean(), z.string()])
     .transform((val) => {

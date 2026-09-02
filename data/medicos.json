@@ -1,16 +1,23 @@
 [
   {
     "id": 1,
-    "nombre": "Dr. López",
-    "documento": "undefined",
-    "especialidad": "Espeleología",
-    "disponible": true
+    "nombre": "Dr. López Actualizado",
+    "documento": "12345678",
+    "especialidad": "Clínica Médica",
+    "disponible": false
   },
   {
     "id": 2,
     "nombre": "Dra. García",
     "documento": "87654321",
     "especialidad": "Odontología",
+    "disponible": true
+  },
+  {
+    "id": 5,
+    "nombre": "Dra. Fernández",
+    "documento": "66666666",
+    "especialidad": "Nutrición",
     "disponible": true
   }
 ]
