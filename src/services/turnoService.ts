@@ -2,6 +2,7 @@ import { Turno, TurnoCrudo } from "../models/models.js";
 import { leerTurnos } from "../fileServices.js";
 import { guardarTurnos } from "../fileServices.js";
 import { turnoEmitter } from "../events/turnoEmitter.js";
+import { AppError } from "../utils/AppError.js";
 
 // GET /turnos — Obtener todos
 export async function obtenerTodosService(): Promise<Turno[]> {
@@ -12,37 +13,48 @@ export async function obtenerTodosService(): Promise<Turno[]> {
 // GET /turnos/:id — Obtener por ID
 export async function obtenerPorIdService(id: number): Promise<Turno | null> {
   const turnos = await leerTurnos();
-  return turnos.find(t => t.id === id) || null;
+  const turno = turnos.find(t => t.id ===id);
+
+  if (!turno) {
+    throw new AppError(
+      "Turno no encontrado",
+      404,
+      "RESOURCE_NOT_FOUND",
+      [{id,mensaje: "El turno solicitado no existe"}]
+
+    )
+  }
+
+  return turno;
 }
 
 // POST /turnos — Crear
 export async function crearTurnoService(datosDeTurno: TurnoCrudo): Promise<Turno> {
   if (!datosDeTurno.paciente || !datosDeTurno.especialidad) {
-    throw new Error("Datos incompletos");
+    throw new AppError(
+      "Datos incompletos en la solicitud",
+      400,
+      "VALIDATION_ERROR",
+      [{campos: ["paciente","especialidad"], mensaje:"Campos obligatorios faltantes"}]
+    );
   }
 
   const turnosExistentes = await leerTurnos();
 
-  console.log("=== DEBUG ===");
-  console.log("Turnos existentes en archivo:", turnosExistentes.map(t => ({ id: t.id, tipo: typeof t.id })));
-  console.log("ID que intento crear:", datosDeTurno.id, "Tipo:", typeof datosDeTurno.id);
-  console.log("ID convertido a número:", Number(datosDeTurno.id));
-  
   const turnoYaExiste = turnosExistentes.some(
-    t => {
-      const comparacion = t.id === Number(datosDeTurno.id);
-      console.log(`Comparando: ${t.id} (${typeof t.id}) === ${Number(datosDeTurno.id)} → ${comparacion}`);
-      return comparacion;
-    }
+    t=> t.id === Number(datosDeTurno.id)
   );
-  
-  console.log("¿El turno ya existe?", turnoYaExiste);
-  console.log("=== FIN DEBUG ===");
-  
-  if (turnoYaExiste) {
-    throw new Error("El turno ya existe");
-  }
 
+  
+  if (turnoYaExiste){
+    throw new AppError(
+      "El turno ya existe",
+      409,
+      "RESOURCE_CONFLICT",
+      [{id:datosDeTurno.id,mensaje:"Un turno con este ID ya se registró"}]
+    );
+  }
+  
   const nuevoTurno: Turno = {
     id: Number(datosDeTurno.id),
     paciente: datosDeTurno.paciente.trim(),
@@ -73,14 +85,13 @@ export async function actualizarTurnoService(
     const turnos = await leerTurnos();
     const turnoExistente = turnos.find(t => t.id === id);
   
-    console.log("=== DEBUG ACTUALIZAR ===");
-    console.log("ID a actualizar:", id);
-    console.log("Turno existente:", turnoExistente);
-    console.log("Datos a actualizar:", datosDeTurno);
-  
     if (!turnoExistente) {
-      console.log("Turno NO encontrado");
-      return null;
+      throw new AppError(
+        "Turno no encontrado",
+        404,
+        "RESOURCE_NOT_FOUND",
+        [{ id, mensaje: "No hay turno con ese ID para actualizar" }]
+      );
     }
   
     const turnoActualizado: Turno = {
@@ -94,8 +105,7 @@ export async function actualizarTurnoService(
         ? Boolean(datosDeTurno.confirmado) 
         : turnoExistente.confirmado,
     };
-  
-    console.log("Turno actualizado:", turnoActualizado);
+
 
     //Guardo el turno en el archivo
     const turnosActualizados = turnos.map(t => t.id === id ? turnoActualizado : t);
@@ -104,18 +114,21 @@ export async function actualizarTurnoService(
     //Emito Evento
     turnoEmitter.emit("turno:actualizado", turnoActualizado);
   
-    console.log("=== FIN DEBUG ===");
-  
     return turnoActualizado;
   }
 
 // DELETE /turnos/:id — Eliminar
-export async function eliminarTurnoService(id: number): Promise<boolean> {
+export async function eliminarTurnoService(id: number): Promise< {id:number}> {
     const turnos = await leerTurnos();
     const existe = turnos.some(t => t.id === id);
   
     if (!existe) {
-      return false;
+      throw new AppError(
+        "Turno no encontrado",
+        404,
+        "RESOURCE_NOT_FOUND",
+        [{ id, mensaje: "No hay turno con ese ID para eliminar" }]
+      );
     }
   
     //Filtrar el turno a eliminar
@@ -125,5 +138,5 @@ export async function eliminarTurnoService(id: number): Promise<boolean> {
     //Emitir evento
     turnoEmitter.emit("turno:eliminado", { id });
   
-    return true;
+    return {id};
   }
