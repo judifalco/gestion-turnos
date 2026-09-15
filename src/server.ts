@@ -5,6 +5,8 @@ import turnosRouter from "./routes/turnos.js";
 import medicoRouter from "./routes/medicoRouter.js";
 import { turnoEmitter } from "./events/turnoEmitter.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
+import { welcomeController, notFoundController } from "./controllers/generalController.js";
+
 
 const app = express();
 const httpServer = createServer(app);
@@ -18,6 +20,10 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware para parsear JSON
 app.use(express.json());
+
+// 🔹 Ruta de bienvenida
+app.get("/", welcomeController);
+
 
 // Conectar las rutas
 app.use("/turnos", turnosRouter);
@@ -55,6 +61,9 @@ turnoEmitter.on("turno:creado", (turno) => {
   
 // Middleware de errores
 app.use(errorHandler);
+
+// 🔹 Middleware para rutas no encontradas
+app.use(notFoundController);
 
 // Iniciar el servidor
 httpServer.listen(PORT, () => {

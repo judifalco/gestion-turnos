@@ -9,34 +9,58 @@ import {
   eliminarTurnoService,
   FiltrosTurnos
 } from "../services/turnoService.js";
+import { turnoInputSchema } from "../schemas/turnoSchema.js";
 
 // GET /turnos — Obtener todos o con filtros
 export async function obtenerTodosLosController(
   req: Request,
   res: Response,
   _next: NextFunction
-): Promise<void> {
-  // Verificar si hay query parameters de filtro
-  const tieneEspecialidad = req.query.especialidad !== undefined;
-  const tieneFecha = req.query.fecha !== undefined;
-  const tieneMedicoId = req.query.medicoId !== undefined;
+): Promise<Response> {
+  let status = 200;
+  
+  try {
+    // 🔹 Verificar si hay query parameters de filtro
+    const tieneEspecialidad = req.query.especialidad !== undefined;
+    const tieneFecha = req.query.fecha !== undefined;
+    const tieneMedicoId = req.query.medicoId !== undefined;
 
-  // Si hay al menos un filtro, usar la función con filtros
-  if (tieneEspecialidad || tieneFecha || tieneMedicoId) {
-    const filtros: FiltrosTurnos = {
-      especialidad: req.query.especialidad as string | undefined,
-      fecha: req.query.fecha as string | undefined,
-      medicoId: req.query.medicoId ? Number(req.query.medicoId) : undefined,
-    };
+    let turnos;
 
-    const turnos = await obtenerTurnosConFiltrosService(filtros);
-    res.status(200).json(turnos);
-    return;
+    // Si hay al menos un filtro, usar la función con filtros
+    if (tieneEspecialidad || tieneFecha || tieneMedicoId) {
+      const filtros: FiltrosTurnos = {
+        especialidad: req.query.especialidad as string | undefined,
+        fecha: req.query.fecha as string | undefined,
+        medicoId: req.query.medicoId ? Number(req.query.medicoId) : undefined,
+      };
+
+      turnos = await obtenerTurnosConFiltrosService(filtros);
+    } else {
+      // Si no hay filtros, obtener todos
+      turnos = await obtenerTodosService();
+    }
+
+    // 🔹 VALIDACIÓN POSTERIOR
+    if (!turnos || turnos.length === 0) {
+      status = 200; // Devolvemos 200 con array vacío
+    }
+
+    // 🔹 RESPUESTA EXITOSA
+    return res.status(status).json({
+      status,
+      message: "Turnos obtenidos correctamente",
+      data: turnos
+    });
+
+  } catch (error: any) {
+    status = 500;
+    return res.status(status).json({
+      status,
+      message: error.message || "Error interno del servidor",
+      data: null
+    });
   }
-
-  // Si no hay filtros, obtener todos
-  const turnos = await obtenerTodosService();
-  res.status(200).json(turnos);
 }
 
 // GET /turnos/:id — Obtener por ID
@@ -44,10 +68,47 @@ export async function obtenerPorIdController(
   req: Request,
   res: Response,
   _next: NextFunction
-): Promise<void> {
-  const id = Number(req.params.id);
-  const turno = await obtenerPorIdService(id);
-  res.status(200).json(turno);
+): Promise<Response> {
+  let status = 200;
+  
+  try {
+    // 🔹 VALIDACIÓN PREVIA 1: ¿el ID existe?
+    const { id } = req.params;
+    if (!id) {
+      status = 400;
+      throw new Error("El ID es requerido");
+    }
+
+    // 🔹 VALIDACIÓN PREVIA 2: ¿el ID es un número válido?
+    const idNumerico = Number(id);
+    if (isNaN(idNumerico) || idNumerico <= 0) {
+      status = 400;
+      throw new Error("El ID debe ser un número positivo");
+    }
+
+    // 🔹 Llamar servicio
+    const turno = await obtenerPorIdService(idNumerico);
+
+    // 🔹 VALIDACIÓN POSTERIOR: ¿el servicio devolvió algo?
+    if (!turno) {
+      status = 404;
+      throw new Error("Turno no encontrado");
+    }
+
+    // 🔹 RESPUESTA EXITOSA
+    return res.status(status).json({
+      status,
+      message: "Turno obtenido correctamente",
+      data: turno
+    });
+
+  } catch (error: any) {
+    return res.status(status).json({
+      status,
+      message: error.message || "Error interno del servidor",
+      data: null
+    });
+  }
 }
 
 // POST /turnos — Crear
@@ -55,9 +116,42 @@ export async function crearTurnoController(
   req: Request,
   res: Response,
   _next: NextFunction
-): Promise<void> {
-  const nuevoTurno = await crearTurnoService(req.body);
-  res.status(201).json(nuevoTurno);
+): Promise<Response> {
+  let status = 201;
+  
+  try {
+    // 🔹 VALIDACIÓN PREVIA: ¿el body no está vacío?
+    if (!req.body || Object.keys(req.body).length === 0) {
+      status = 400;
+      throw new Error("El cuerpo de la solicitud no puede estar vacío");
+    }
+
+    // 🔹 VALIDACIÓN CON ZOD 
+     const resultado = turnoInputSchema.safeParse(req.body);
+     const { success, data, error } = resultado;
+     if (!success) {
+       status = 400;
+       throw new Error(`Validación fallida: ${error.issues[0].message}`);
+     }
+
+    // 🔹 Llamar servicio con datos validados
+    const nuevoTurno = await crearTurnoService(data);
+    
+
+    // 🔹 RESPUESTA EXITOSA
+    return res.status(status).json({
+      status,
+      message: "Turno creado correctamente",
+      data: nuevoTurno
+    });
+
+  } catch (error: any) {
+    return res.status(status).json({
+      status,
+      message: error.message || "Error interno del servidor",
+      data: null
+    });
+  }
 }
 
 // PUT /turnos/:id — Actualizar
@@ -65,19 +159,103 @@ export async function actualizarTurnoController(
   req: Request,
   res: Response,
   _next: NextFunction
-): Promise<void> {
-  const id = Number(req.params.id);
-  const turnoActualizado = await actualizarTurnoService(id, req.body);
-  res.status(200).json(turnoActualizado);
-}
+): Promise<Response> {
+  let status = 200;
+  
+  try {
+    // 🔹 VALIDACIÓN PREVIA 1: ¿el ID existe y es válido?
+    const { id } = req.params;
+    if (!id) {
+      status = 400;
+      throw new Error("El ID es requerido");
+    }
 
+    const idNumerico = Number(id);
+    if (isNaN(idNumerico) || idNumerico <= 0) {
+      status = 400;
+      throw new Error("El ID debe ser un número positivo");
+    }
+
+    // 🔹 VALIDACIÓN PREVIA 2: ¿el body no está vacío?
+    if (!req.body || Object.keys(req.body).length === 0) {
+      status = 400;
+      throw new Error("El cuerpo de la solicitud no puede estar vacío");
+    }
+
+    // 🔹 VALIDACIÓN CON ZOD
+     const resultado = turnoInputSchema.safeParse(req.body);
+     const { success, data, error } = resultado;
+     if (!success) {
+       status = 400;
+       throw new Error(`Validación fallida: ${error.issues[0].message}`);
+     }
+
+    // 🔹 Llamar servicio con datos validados
+    const turnoActualizado = await actualizarTurnoService(idNumerico, data);
+
+
+    // 🔹 VALIDACIÓN POSTERIOR: ¿el servicio devolvió algo?
+    if (!turnoActualizado) {
+      status = 404;
+      throw new Error("Turno no encontrado");
+    }
+
+    // 🔹 RESPUESTA EXITOSA
+    return res.status(status).json({
+      status,
+      message: "Turno actualizado correctamente",
+      data: turnoActualizado
+    });
+
+  } catch (error: any) {
+    return res.status(status).json({
+      status,
+      message: error.message || "Error interno del servidor",
+      data: null
+    });
+  }
+}
 // DELETE /turnos/:id — Eliminar
 export async function eliminarTurnoController(
   req: Request,
   res: Response,
   _next: NextFunction
-): Promise<void> {
-  const id = Number(req.params.id);
-  const resultado = await eliminarTurnoService(id);
-  res.status(204).send();  // 204 No Content (sin body)
+): Promise<Response> {
+  let status = 204;
+  
+  try {
+    // 🔹 VALIDACIÓN PREVIA 1: ¿el ID existe?
+    const { id } = req.params;
+    if (!id) {
+      status = 400;
+      throw new Error("El ID es requerido");
+    }
+
+    // 🔹 VALIDACIÓN PREVIA 2: ¿el ID es un número válido?
+    const idNumerico = Number(id);
+    if (isNaN(idNumerico) || idNumerico <= 0) {
+      status = 400;
+      throw new Error("El ID debe ser un número positivo");
+    }
+
+    // 🔹 Llamar servicio
+    const resultado = await eliminarTurnoService(idNumerico);
+
+    // 🔹 VALIDACIÓN POSTERIOR: ¿el servicio encontró el turno?
+    if (!resultado) {
+      status = 404;
+      throw new Error("Turno no encontrado");
+    }
+
+    // 🔹 RESPUESTA EXITOSA (204 NO DEVUELVE BODY)
+    return res.status(status).send();
+    
+  } catch (error: any) {
+    // En caso de error, sí devolvemos JSON
+    return res.status(status).json({
+      status,
+      message: error.message || "Error interno del servidor",
+      data: null
+    });
+  }
 }
