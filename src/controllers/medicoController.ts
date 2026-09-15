@@ -57,10 +57,12 @@ export async function obtenerTodosMedicosController(
     });
 
   } catch (error: any) {
-    status = 500;
-    return res.status(status).json({
-      status,
+    const errorStatus = error.status || 500;
+    return res.status(errorStatus).json({
+      status: errorStatus,
       message: error.message || "Error interno del servidor",
+      code: error.code || "INTERNAL_SERVER_ERROR",
+      details: error.details || [],
       data: null
     });
   }
@@ -105,10 +107,12 @@ export async function obtenerMedicosPorIdController(
       data: medico
     });
   } catch (error: any) {
-    // 🔹 CAPTURA DE ERROR: estructura uniforme
-    return res.status(status).json({
-      status,
+    const errorStatus = error.status || 500;
+    return res.status(errorStatus).json({
+      status: errorStatus,
       message: error.message || "Error interno del servidor",
+      code: error.code || "INTERNAL_SERVER_ERROR",
+      details: error.details || [],
       data: null
     });
   }
@@ -141,9 +145,12 @@ export async function crearMedicoController(
       data: nuevoMedico
     });
   } catch (error: any) {
-    return res.status(status).json({
-      status,
+    const errorStatus = error.status || 500;
+    return res.status(errorStatus).json({
+      status: errorStatus,
       message: error.message || "Error interno del servidor",
+      code: error.code || "INTERNAL_SERVER_ERROR",
+      details: error.details || [],
       data: null
     });
   }
@@ -203,9 +210,12 @@ export async function actualizarMedicoController(
     });
     
   } catch (error: any) {
-    return res.status(status).json({
-      status,
+    const errorStatus = error.status || 500;
+    return res.status(errorStatus).json({
+      status: errorStatus,
       message: error.message || "Error interno del servidor",
+      code: error.code || "INTERNAL_SERVER_ERROR",
+      details: error.details || [],
       data: null
     });
   }
@@ -247,10 +257,12 @@ export async function eliminarMedicoController(
     return res.status(status).send();
     
   } catch (error: any) {
-    // En caso de error, sí devolvemos JSON
-    return res.status(status).json({
-      status,
+    const errorStatus = error.status || 500;
+    return res.status(errorStatus).json({
+      status: errorStatus,
       message: error.message || "Error interno del servidor",
+      code: error.code || "INTERNAL_SERVER_ERROR",
+      details: error.details || [],
       data: null
     });
   }

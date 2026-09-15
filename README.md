@@ -100,6 +100,7 @@ turnos-red/
 │   ├── controllers/
 │   │   ├── turnoController.ts           # Controladores de turnos
 │   │   └── medicoController.ts          # ✅ Controladores de médicos
+│   │   └── generalController.ts         # Controladores de bienvenida y ruta no encontrada
 │   │
 │   ├── services/
 │   │   ├── turnoService.ts              # Lógica de negocio de turnos (CRUD + filtros)
@@ -171,6 +172,13 @@ turnos-red/
 - **Desarrollo:** `http://localhost:3000`
 - **Mock Server (pruebas):** `https://ae66ffdf-ffbe-4e77-b757-26709091504c.mock.pstmn.io`
 
+### General
+| Método | Endpoint | Descripción | Estado |
+|--------|----------|-------------|--------|
+| GET | `/` | Obtener mensaje de Bienvenida | 200 |
+| GET | `/{ruta-inexistente}` | Obtener ruta inválida | 404 |
+
+
 ### Turnos
 
 | Método | Endpoint | Descripción | Estado |
@@ -203,6 +211,28 @@ Sección 2: Ejemplos de Solicitudes
 
 **Solicitud:**
 ```bash
+
+curl -X GET http://localhost:3000/
+Respuesta (200 OK):
+[
+  {
+      "status": 200,
+      "message": "Bienvenido a TurnosMed API 3 - Refactorizado con Clean Architecture",
+      "data": null
+  }
+]
+
+curl -X GET http://localhost:3000/{ruta-inexistente}
+Respuesta (404 Not Found):
+
+[
+  {
+    "status": 404,
+    "message": "La ruta GET /ruta-inexistente no existe",
+    "data": null
+  }
+]
+
 curl -X GET http://localhost:3000/turnos
 Respuesta (200 OK):
 

@@ -54,10 +54,14 @@ export async function obtenerTodosLosController(
     });
 
   } catch (error: any) {
-    status = 500;
-    return res.status(status).json({
-      status,
+    // 🔹 Extraer el status del error si es AppError
+    const errorStatus = error.status || 500;
+    
+    return res.status(errorStatus).json({
+      status: errorStatus,
       message: error.message || "Error interno del servidor",
+      code: error.code || "INTERNAL_SERVER_ERROR",
+      details: error.details || [],
       data: null
     });
   }
@@ -87,13 +91,8 @@ export async function obtenerPorIdController(
     }
 
     // 🔹 Llamar servicio
+    // 🔹 Si no existe, el servicio lanza AppError automáticamente
     const turno = await obtenerPorIdService(idNumerico);
-
-    // 🔹 VALIDACIÓN POSTERIOR: ¿el servicio devolvió algo?
-    if (!turno) {
-      status = 404;
-      throw new Error("Turno no encontrado");
-    }
 
     // 🔹 RESPUESTA EXITOSA
     return res.status(status).json({
@@ -103,9 +102,14 @@ export async function obtenerPorIdController(
     });
 
   } catch (error: any) {
-    return res.status(status).json({
-      status,
+    // 🔹 Extraer el status del error si es AppError
+    const errorStatus = error.status || 500;
+    
+    return res.status(errorStatus).json({
+      status: errorStatus,
       message: error.message || "Error interno del servidor",
+      code: error.code || "INTERNAL_SERVER_ERROR",
+      details: error.details || [],
       data: null
     });
   }
@@ -146,9 +150,14 @@ export async function crearTurnoController(
     });
 
   } catch (error: any) {
-    return res.status(status).json({
-      status,
+    // 🔹 Extraer el status del error si es AppError
+    const errorStatus = error.status || 500;
+    
+    return res.status(errorStatus).json({
+      status: errorStatus,
       message: error.message || "Error interno del servidor",
+      code: error.code || "INTERNAL_SERVER_ERROR",
+      details: error.details || [],
       data: null
     });
   }
@@ -208,9 +217,14 @@ export async function actualizarTurnoController(
     });
 
   } catch (error: any) {
-    return res.status(status).json({
-      status,
+    // 🔹 Extraer el status del error si es AppError
+    const errorStatus = error.status || 500;
+    
+    return res.status(errorStatus).json({
+      status: errorStatus,
       message: error.message || "Error interno del servidor",
+      code: error.code || "INTERNAL_SERVER_ERROR",
+      details: error.details || [],
       data: null
     });
   }
@@ -251,10 +265,14 @@ export async function eliminarTurnoController(
     return res.status(status).send();
     
   } catch (error: any) {
-    // En caso de error, sí devolvemos JSON
-    return res.status(status).json({
-      status,
+    // 🔹 Extraer el status del error si es AppError
+    const errorStatus = error.status || 500;
+    
+    return res.status(errorStatus).json({
+      status: errorStatus,
       message: error.message || "Error interno del servidor",
+      code: error.code || "INTERNAL_SERVER_ERROR",
+      details: error.details || [],
       data: null
     });
   }
