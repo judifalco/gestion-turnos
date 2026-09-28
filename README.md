@@ -143,6 +143,7 @@ turnos-red/
 ├── package-lock.json                    # Lock de dependencias
 ├── turnos-red.postman_collection.json       # ✅ Colección de Postman con tests
 ├── README.md                            # Documentación técnica
+├── pacientes-turnos.md                  # Documentación del modulo de pacientes y turnos actualizado
 └── .nvmrc                               # Versión de Node.js (NVM)
 
 ---
@@ -184,9 +185,7 @@ turnos-red/
 | Método | Endpoint | Descripción | Estado |
 |--------|----------|-------------|--------|
 | GET | `/turnos` | Obtener todos los turnos | 200 |
-| GET | `/turnos?especialidad=Pediatría` | Filtrar por especialidad | 200 |
 | GET | `/turnos?fecha=2026-07-15` | Filtrar por fecha | 200 |
-| GET | `/turnos?especialidad=Pediatría&fecha=2026-07-15` | Filtrar por especialidad y fecha | 200 |
 | GET | `/turnos/:id` | Obtener un turno por ID | 200 / 404 |
 | POST | `/turnos` | Crear un nuevo turno | 201 / 400 |
 | PUT | `/turnos/:id` | Actualizar un turno | 200 / 404 / 400 |
@@ -205,6 +204,17 @@ turnos-red/
 | PUT | `/medicos/:id` | Actualizar un médico | 200 / 404 / 400 |
 | DELETE | `/medicos/:id` | Eliminar un médico | 204 / 404 |
 Sección 2: Ejemplos de Solicitudes
+
+### Pacientes
+ 
+| Método | Endpoint | Descripción | Estado |
+|----------|----------|-------------|--------|
+| GET | `/pacientes` | Obtener todos los pacientes | 200 |
+| GET | `/pacientes/:id` | Obtener un paciente por ID | 200 / 404 |
+| POST | `/pacientes` | Crear un nuevo paciente (valida DNI único) | 201 / 400 / 409 |
+| PUT | `/pacientes/:id` | Actualizar un paciente | 200 / 404 / 400 |
+| DELETE | `/pacientes/:id` | Dar de baja un paciente | 204 / 404 |
+
 ## 📝 Ejemplos de Solicitudes
 
 ### GET /turnos (Listar todos)
@@ -248,40 +258,7 @@ Respuesta (200 OK):
     "observaciones": "Paciente puntual"
   }
 ]
-GET /turnos?especialidad=Pediatría (Filtrar por especialidad)
-Solicitud:
 
-curl -X GET "http://localhost:3000/turnos?especialidad=Pediatría"
-Respuesta (200 OK):
-
-[
-  {
-    "id": 1,
-    "paciente": "Carlos López",
-    "documento": "12345678",
-    "especialidad": "Pediatría",
-    "fecha": "2026-07-15",
-    "hora": "10:00",
-    "confirmado": true
-  }
-]
-GET /turnos?fecha=2026-07-15&especialidad=Pediatría (Filtros múltiples)
-Solicitud:
-
-curl -X GET "http://localhost:3000/turnos?fecha=2026-07-15&especialidad=Pediatría"
-Respuesta (200 OK):
-
-[
-  {
-    "id": 1,
-    "paciente": "Carlos López",
-    "documento": "12345678",
-    "especialidad": "Pediatría",
-    "fecha": "2026-07-15",
-    "hora": "10:00",
-    "confirmado": true
-  }
-]
 GET /turnos/:id (Obtener uno por ID)
 Solicitud:
 

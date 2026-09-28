@@ -6,9 +6,10 @@ import { AppError } from "../utils/AppError.js";
 
 // ========== INTERFAZ DE FILTROS ==========
 export interface FiltrosTurnos {
-  especialidad?: string;
-  fecha?: string;
-  medicoId?: number;
+fecha?: string;
+medicoId?: number;
+pacienteId?: number;
+confirmado?: boolean;
 }
 
 // GET /turnos — Obtener todos
@@ -20,33 +21,38 @@ export async function obtenerTodosService(): Promise<Turno[]> {
 // GET /turnos — Obtener con filtros opcionales
 export async function obtenerTurnosConFiltrosService(
   filtros: FiltrosTurnos
-): Promise<Turno[]> {
+  ): Promise<Turno[]> {
+  
   const turnos = await leerTurnos();
-
-  // Aplicar filtros de forma encadenada
+  
   let resultado = turnos;
-
-  // Filtrar por especialidad (case-insensitive)
-  if (filtros.especialidad) {
-    resultado = resultado.filter(
-      t => t.especialidad.toLowerCase() === filtros.especialidad!.toLowerCase()
-    );
-  }
-
-  // Filtrar por fecha
+  
   if (filtros.fecha) {
-    resultado = resultado.filter(t => t.fecha === filtros.fecha);
+  resultado = resultado.filter(
+  t => t.fecha === filtros.fecha
+  );
   }
-
-  // Filtrar por medicoId (si ese campo existiera en Turno)
-  // Por ahora lo dejamos documentado para futuro
-  if (filtros.medicoId) {
-    // TODO: Implementar cuando Turno tenga relación con Médico
-    console.warn("⚠️ Filtro medicoId aún no implementado en Turno");
+  
+  if (filtros.medicoId !== undefined) {
+  resultado = resultado.filter(
+  t => t.medicoId === filtros.medicoId
+  );
   }
-
+  
+  if (filtros.pacienteId !== undefined) {
+  resultado = resultado.filter(
+  t => t.pacienteId === filtros.pacienteId
+  );
+  }
+  
+  if (filtros.confirmado !== undefined) {
+  resultado = resultado.filter(
+  t => t.confirmado === filtros.confirmado
+  );
+  }
+  
   return resultado;
-}
+  }
 
 // GET /turnos/:id — Obtener por ID
 export async function obtenerPorIdService(id: number): Promise<Turno | null> {
@@ -68,41 +74,64 @@ export async function obtenerPorIdService(id: number): Promise<Turno | null> {
 
 // POST /turnos — Crear
 export async function crearTurnoService(datosDeTurno: TurnoCrudo): Promise<Turno> {
-  if (!datosDeTurno.paciente || !datosDeTurno.especialidad) {
+  if (
+    datosDeTurno.id === undefined ||
+    datosDeTurno.pacienteId === undefined ||
+    datosDeTurno.medicoId === undefined ||
+    !datosDeTurno.fecha ||
+    !datosDeTurno.hora
+    ) {
     throw new AppError(
-      "Datos incompletos en la solicitud",
-      400,
-      "VALIDATION_ERROR",
-      [{campos: ["paciente","especialidad"], mensaje:"Campos obligatorios faltantes"}]
+    "Datos incompletos en la solicitud",
+    400,
+    "VALIDATION_ERROR",
+    [
+    {
+    campos: [
+    "id",
+    "pacienteId",
+    "medicoId",
+    "fecha",
+    "hora"
+    ],
+    mensaje: "Campos obligatorios faltantes"
+    }
+    ]
     );
-  }
+    }
 
-  const turnosExistentes = await leerTurnos();
+    const turnosExistentes = await leerTurnos();
 
-  const turnoYaExiste = turnosExistentes.some(
-    t=> t.id === Number(datosDeTurno.id)
-  );
-
-  
-  if (turnoYaExiste){
-    throw new AppError(
-      "El turno ya existe",
-      409,
-      "RESOURCE_CONFLICT",
-      [{id:datosDeTurno.id,mensaje:"Un turno con este ID ya se registró"}]
+    const turnoYaExiste = turnosExistentes.some(
+      t=> t.id === Number(datosDeTurno.id)
     );
-  }
   
-  const nuevoTurno: Turno = {
-    id: Number(datosDeTurno.id),
-    paciente: datosDeTurno.paciente.trim(),
-    documento: String(datosDeTurno.documento),
-    especialidad: datosDeTurno.especialidad,
-    fecha: String(datosDeTurno.fecha),
-    hora: String(datosDeTurno.hora),
-    confirmado: false,
-    observaciones: datosDeTurno.observaciones,
-  };
+    
+    if (turnoYaExiste){
+      throw new AppError(
+        "El turno ya existe",
+        409,
+        "RESOURCE_CONFLICT",
+        [{id:datosDeTurno.id,mensaje:"Un turno con este ID ya se registró"}]
+      );
+    }
+  
+    const nuevoTurno: Turno = {
+      id: Number(datosDeTurno.id),
+      pacienteId: Number(datosDeTurno.pacienteId),
+      medicoId: Number(datosDeTurno.medicoId),
+      fecha: datosDeTurno.fecha,
+      hora: datosDeTurno.hora,
+      confirmado:
+      typeof datosDeTurno.confirmado === "boolean"
+      ? datosDeTurno.confirmado
+      : datosDeTurno.confirmado === "si" ||
+      datosDeTurno.confirmado === "true",
+      observaciones:
+      datosDeTurno.observaciones,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      };
 
   //Guardo el turno
   const turnosActualizados = [...turnosExistentes, nuevoTurno];
@@ -134,15 +163,34 @@ export async function actualizarTurnoService(
   
     const turnoActualizado: Turno = {
       ...turnoExistente,
-      paciente: datosDeTurno.paciente?.trim() || turnoExistente.paciente,
-      documento: String(datosDeTurno.documento) || turnoExistente.documento,
-      especialidad: datosDeTurno.especialidad || turnoExistente.especialidad,
-      fecha: String(datosDeTurno.fecha) || turnoExistente.fecha,
-      hora: String(datosDeTurno.hora) || turnoExistente.hora,
-      confirmado: datosDeTurno.confirmado !== undefined 
-        ? Boolean(datosDeTurno.confirmado) 
-        : turnoExistente.confirmado,
-    };
+      pacienteId:
+      datosDeTurno.pacienteId !== undefined
+      ? Number(datosDeTurno.pacienteId)
+      : turnoExistente.pacienteId,
+      medicoId:
+      datosDeTurno.medicoId !== undefined
+      ? Number(datosDeTurno.medicoId)
+      : turnoExistente.medicoId,
+      fecha:
+      datosDeTurno.fecha ??
+      turnoExistente.fecha,
+      hora:
+      datosDeTurno.hora ??
+      turnoExistente.hora,
+      confirmado:
+      datosDeTurno.confirmado !== undefined
+      ? (
+      typeof datosDeTurno.confirmado === "boolean"
+      ? datosDeTurno.confirmado
+      : datosDeTurno.confirmado === "si" ||
+      datosDeTurno.confirmado === "true"
+      )
+      : turnoExistente.confirmado,
+      observaciones:
+      datosDeTurno.observaciones ??
+      turnoExistente.observaciones,
+      updatedAt: new Date(),
+      };
 
 
     //Guardo el turno en el archivo

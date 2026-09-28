@@ -1,23 +1,38 @@
 [
   {
     "id": 1,
-    "nombre": "Dr. López Actualizado",
+    "nombre": "Dr. López Actualizado API 3",
     "documento": "12345678",
     "especialidad": "Clínica Médica",
-    "disponible": false
+    "disponible": false,
+    "createdAt": "2026-01-01T10:00:00Z",
+    "updatedAt": "2026-01-01T10:00:00Z"
   },
   {
     "id": 2,
     "nombre": "Dra. García",
     "documento": "87654321",
     "especialidad": "Odontología",
-    "disponible": true
+    "disponible": true,
+    "createdAt": "2026-01-01T10:00:00Z",
+    "updatedAt": "2026-01-01T10:00:00Z"
   },
   {
     "id": 5,
     "nombre": "Dra. Fernández",
     "documento": "66666666",
     "especialidad": "Nutrición",
-    "disponible": true
+    "disponible": true,
+    "createdAt": "2026-01-01T10:00:00Z",
+    "updatedAt": "2026-01-01T10:00:00Z"
+  },
+  {
+    "id": 55,
+    "nombre": "Dra. Sputnik",
+    "documento": "55441122",
+    "especialidad": "Psicología",
+    "disponible": true,
+    "createdAt": "2026-01-01T10:00:00Z",
+    "updatedAt": "2026-01-01T10:00:00Z"
   }
 ]

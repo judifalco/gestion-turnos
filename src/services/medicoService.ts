@@ -82,16 +82,20 @@ export async function crearMedicoService(datosDeMedico: MedicoCrudo): Promise<Me
       [{ id: datosDeMedico.id, mensaje: "Un médico con este ID ya está registrado" }]
     );
   }
-
+  
   const nuevoMedico: Medico = {
     id: Number(datosDeMedico.id),
     nombre: datosDeMedico.nombre.trim(),
     documento: String(datosDeMedico.documento),
-    especialidad: datosDeMedico.especialidad,
-    disponible: typeof datosDeMedico.disponible === "boolean"
-      ? datosDeMedico.disponible
-      : datosDeMedico.disponible === "si" || datosDeMedico.disponible === "true",
-  };
+    especialidad: datosDeMedico.especialidad.trim(),
+    disponible:
+    typeof datosDeMedico.disponible === "boolean"
+    ? datosDeMedico.disponible
+    : datosDeMedico.disponible === "si" ||
+    datosDeMedico.disponible === "true",
+    
+    createdAt: new Date(),
+    updatedAt: new Date(),};
 
   const medicosActualizados = [...medicosExistentes, nuevoMedico];
   await guardarMedicos(medicosActualizados);
@@ -118,15 +122,30 @@ export async function actualizarMedicoService(
 
   const medicoActualizado: Medico = {
     ...medicoExistente,
-    nombre: datosDeMedico.nombre?.trim() || medicoExistente.nombre,
-    documento: String(datosDeMedico.documento) || medicoExistente.documento,
-    especialidad: datosDeMedico.especialidad || medicoExistente.especialidad,
-    disponible: datosDeMedico.disponible !== undefined
-      ? typeof datosDeMedico.disponible === "boolean"
-        ? datosDeMedico.disponible
-        : datosDeMedico.disponible === "si" || datosDeMedico.disponible === "true"
-      : medicoExistente.disponible,
-  };
+    
+    nombre:
+    datosDeMedico.nombre?.trim() ??
+    medicoExistente.nombre,
+    
+    documento:
+    datosDeMedico.documento !== undefined
+    ? String(datosDeMedico.documento)
+    : medicoExistente.documento,
+    
+    especialidad:
+    datosDeMedico.especialidad ??
+    medicoExistente.especialidad,
+    
+    disponible:
+    datosDeMedico.disponible !== undefined
+    ? typeof datosDeMedico.disponible === "boolean"
+    ? datosDeMedico.disponible
+    : datosDeMedico.disponible === "si" ||
+    datosDeMedico.disponible === "true"
+    : medicoExistente.disponible,
+    
+    updatedAt: new Date(),
+    };
 
   const medicosActualizados = medicos.map(m => m.id === id ? medicoActualizado : m);
   await guardarMedicos(medicosActualizados);

@@ -21,16 +21,16 @@ export async function obtenerTodosLosController(
   
   try {
     // 🔹 Verificar si hay query parameters de filtro
-    const tieneEspecialidad = req.query.especialidad !== undefined;
+   // const tieneEspecialidad = req.query.especialidad !== undefined;
     const tieneFecha = req.query.fecha !== undefined;
     const tieneMedicoId = req.query.medicoId !== undefined;
 
     let turnos;
 
     // Si hay al menos un filtro, usar la función con filtros
-    if (tieneEspecialidad || tieneFecha || tieneMedicoId) {
+    if (tieneFecha || tieneMedicoId) {
       const filtros: FiltrosTurnos = {
-        especialidad: req.query.especialidad as string | undefined,
+       /* especialidad: req.query.especialidad as string | undefined,*/
         fecha: req.query.fecha as string | undefined,
         medicoId: req.query.medicoId ? Number(req.query.medicoId) : undefined,
       };

@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { Server } from "socket.io";
 import turnosRouter from "./routes/turnos.js";
 import medicoRouter from "./routes/medicoRouter.js";
+import pacienteRouter from "./routes/pacienteRouter.js";
 import { turnoEmitter } from "./events/turnoEmitter.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { welcomeController, notFoundController } from "./controllers/generalController.js";
@@ -30,6 +31,7 @@ app.use("/turnos", turnosRouter);
 
 app.use("/medicos", medicoRouter);
 
+app.use("/pacientes", pacienteRouter);
 
 //Uso de public
 app.use(express.static("public"));

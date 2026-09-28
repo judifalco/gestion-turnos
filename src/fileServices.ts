@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { TurnoCrudo, Turno, Medico, MedicoCrudo } from "./models/models.js";
+import { TurnoCrudo, Turno, Medico, MedicoCrudo, PacienteCrudo, Paciente } from "./models/models.js";
 
 
 /**
@@ -20,62 +20,62 @@ function aTitleCase(texto: string): string {
    */
   function normalizarTurno(crudo: TurnoCrudo): Turno | null {
     try {
-      // Convertir id a número y validar que sea positivo
       const id = Number(crudo.id);
+  
       if (!Number.isInteger(id) || id <= 0) {
-        console.warn(`⚠️ Turno con campo de ID inválido: ${crudo.id}`);
+        console.warn(`⚠️ Turno con ID inválido: ${crudo.id}`);
         return null;
       }
   
-      // Limpiar espacios en blanco del paciente
-      const paciente = crudo.paciente.trim();
-      if (!paciente) {
-        console.warn("⚠️ Turno con campo de Paciente vacío");
+      const pacienteId = Number(crudo.pacienteId);
+  
+      if (!Number.isInteger(pacienteId) || pacienteId <= 0) {
+        console.warn(`⚠️ Turno con pacienteId inválido`);
         return null;
       }
   
-      // Convertir documento a string
-      const documento = String(crudo.documento).trim();
-      if (!documento) {
-        console.warn("⚠️ Turno con campo de Documento vacío");
+      const medicoId = Number(crudo.medicoId);
+  
+      if (!Number.isInteger(medicoId) || medicoId <= 0) {
+        console.warn(`⚠️ Turno con medicoId inválido`);
         return null;
       }
   
-      // Normalizar especialidad a Title Case
-      const especialidad = aTitleCase(crudo.especialidad);
+      const fecha = crudo.fecha.trim();
   
-      // Fecha y hora (validación básica)
-      const fecha = String(crudo.fecha).trim();
-      const hora = String(crudo.hora).trim();
-      if (!fecha || !hora) {
-        console.warn("⚠️ Turno con campo de Fecha u hora vacías");
+      if (!fecha) {
+        console.warn("⚠️ Turno con fecha vacía");
         return null;
       }
   
-      // Convertir confirmado a booleano
-      const confirmado = typeof crudo.confirmado === "boolean"
-        ? crudo.confirmado
-        : crudo.confirmado === "si" || crudo.confirmado === "true";
-
-      //Observaciones puede existir o no
-      const observaciones = crudo.observaciones 
-        ? String(crudo.observaciones).trim() 
-        : undefined;
+      const hora = crudo.hora.trim();
   
-      // Retornar turno normalizado
+      if (!hora) {
+        console.warn("⚠️ Turno con hora vacía");
+        return null;
+      }
+  
+      const confirmado =
+        typeof crudo.confirmado === "boolean"
+          ? crudo.confirmado
+          : crudo.confirmado.toLowerCase() === "si" ||
+            crudo.confirmado.toLowerCase() === "true";
+  
+      const observaciones = crudo.observaciones?.trim();
+  
       return {
         id,
-        paciente,
-        documento,
-        especialidad,
+        pacienteId,
+        medicoId,
         fecha,
         hora,
         confirmado,
         observaciones,
-        // observaciones es opcional, no la incluimos por ahora
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
     } catch (error) {
-      console.warn(`⚠️ Error normalizando registro:`, error);
+      console.warn("⚠️ Error normalizando turno:", error);
       return null;
     }
   }
@@ -193,6 +193,12 @@ function normalizarMedico(crudo: MedicoCrudo): Medico | null {
       documento,
       especialidad,
       disponible,
+      createdAt: crudo.createdAt
+                ? new Date(crudo.createdAt)
+                : new Date(),
+      updatedAt: crudo.updatedAt
+                ? new Date(crudo.updatedAt)
+                : new Date(),
     };
   } catch (error) {
     console.warn(`⚠️ Error normalizando médico:`, error);
@@ -247,6 +253,162 @@ export async function guardarMedicos(medicos: Medico[]): Promise<void> {
     console.log("✅ Médicos guardados exitosamente");
   } catch (error) {
     console.error("❌ Error al guardar médicos:", error);
+    throw error;
+  }
+}
+
+/////////////////Funciones de Pacientes////////////////
+
+function normalizarPaciente(crudo: PacienteCrudo): Paciente | null {
+  try {
+    const id = Number(crudo.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+    console.warn("⚠️ Paciente con ID inválido");
+    return null;
+    }
+
+    const nombre = crudo.nombre.trim();
+
+    if (!nombre) {
+      console.warn("⚠️ Paciente con nombre vacío");
+      return null;
+    }
+
+    const apellido = crudo.apellido.trim();
+
+    if (!apellido) {
+      console.warn("⚠️ Paciente con apellido vacío");
+      return null;
+    }
+
+    const dni = String(crudo.dni).trim();
+
+    if (!dni) {
+      console.warn("⚠️ Paciente con DNI vacío");
+      return null;
+    }
+
+    const fechaNacimiento = String(
+      crudo.fechaNacimiento
+    ).trim();
+
+    if (!fechaNacimiento) {
+      console.warn("⚠️ Paciente con fecha de nacimiento vacía");
+      return null;
+    }
+
+    const email = crudo.email.trim();
+
+    if (!email) {
+      console.warn("⚠️ Paciente con email vacío");
+      return null;
+    }
+
+    const telefono = crudo.telefono.trim();
+
+    if (!telefono) {
+      console.warn("⚠️ Paciente con teléfono vacío");
+      return null;
+    }
+
+    const domicilio = crudo.domicilio?.trim();
+    const obraSocial = crudo.obraSocial?.trim();
+
+    return {
+      id,
+      nombre,
+      apellido,
+      dni,
+      fechaNacimiento,
+      domicilio,
+      email,
+      telefono,
+      obraSocial,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      };
+  } catch (error) {
+    console.warn("⚠️ Error normalizando paciente:", error);
+    return null;
+  }
+}
+
+export async function leerPacientes(): Promise<Paciente[]> {
+  try {
+    const datos = await readFile(
+      "./data/pacientes.json",
+      "utf-8"
+    );
+
+    console.log(
+      "✅ Archivo de pacientes leído exitosamente"
+    );
+
+    const pacientesCrudos: PacienteCrudo[] =
+      JSON.parse(datos);
+
+    const pacientesNormalizados: Paciente[] = [];
+
+    let aceptados = 0;
+    let rechazados = 0;
+
+    for (const crudo of pacientesCrudos) {
+      const pacienteNormalizado =
+        normalizarPaciente(crudo);
+
+      if (pacienteNormalizado) {
+        pacientesNormalizados.push(
+          pacienteNormalizado
+        );
+        aceptados++;
+      } else {
+        rechazados++;
+      }
+    }
+
+    console.log(
+      `✅ Registros de pacientes aceptados: ${aceptados}`
+    );
+
+    console.log(
+      `❌ Registros de pacientes rechazados: ${rechazados}`
+    );
+
+    return pacientesNormalizados;
+  } catch (error) {
+    console.error(
+      "❌ Error al leer pacientes:",
+      error
+    );
+
+    throw error;
+  }
+}
+
+export async function guardarPacientes(
+  pacientes: Paciente[]
+): Promise<void> {
+  try {
+    await writeFile(
+      "./data/pacientes.json",
+      JSON.stringify(
+        pacientes,
+        null,
+        2
+      ),
+      "utf-8"
+    );
+
+    console.log(
+      "✅ Pacientes guardados exitosamente"
+    );
+  } catch (error) {
+    console.error(
+      "❌ Error al guardar pacientes:",
+      error
+    );
+
     throw error;
   }
 }

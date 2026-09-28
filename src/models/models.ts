@@ -1,43 +1,70 @@
-// Interfaz para datos crudos (si vinieran desde JSON con formatos inconsistentes)
+// ============ MÉDICO ============
 export interface MedicoCrudo {
   id: string | number;
   nombre: string;
   documento: string | number;
   especialidad: string;
-  disponible: boolean | string;  // Podría venir como "si"/"no" o true/false
-}
-
-interface TurnoCrudo {
-    id: string | number;
-    paciente: string;
-    documento: string | number;
-    especialidad: string;
-    fecha: string;
-    hora: string;
-    confirmado: string | boolean;
-    observaciones?: string;
+  disponible: boolean | string;
+  createdAt?: string;
+  updatedAt?: string;
   }
-  
 
-  // Interfaz normalizada
 export interface Medico {
   id: number;
   nombre: string;
   documento: string;
-  especialidad: string;  // Title Case: "Pediatría", "Odontología"
+  especialidad: string;
   disponible: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
+// ============ TURNO ============
+export interface TurnoCrudo {
+  id: string | number;
+  pacienteId: string | number;
+  medicoId: string | number;
+  fecha: string;
+  hora: string;
+  confirmado: string | boolean;
+  observaciones?: string;
+}
 
-  interface Turno {
-    id: number;
-    paciente: string;
-    documento: string;
-    especialidad: string;
-    fecha: string;
-    hora: string;
-    confirmado: boolean;
-    observaciones?: string;
-  }
-  
-  export { TurnoCrudo, Turno };
+export interface Turno {
+  id: number;
+  pacienteId: number;
+  medicoId: number;
+  fecha: string;
+  hora: string;
+  confirmado: boolean;
+  observaciones?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ============ PACIENTE ============
+export interface PacienteCrudo {
+  id: string | number;
+  nombre: string;
+  apellido: string;
+  dni: string;
+  fechaNacimiento: string;
+  domicilio?: string;
+  email: string;
+  telefono: string;
+  obraSocial?: string;
+}
+
+export interface Paciente {
+  id: number;
+  nombre: string;
+  apellido: string;
+  dni: string;
+  fechaNacimiento: string;
+  domicilio?: string;
+  email: string;
+  telefono: string;
+  obraSocial?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
